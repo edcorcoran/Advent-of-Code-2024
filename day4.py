@@ -1,7 +1,7 @@
 # Part One
 
-# fhand = open('day4sample.txt')
-fhand = open('day4.txt')
+fhand = open('day4sample.txt')
+# fhand = open('day4.txt')
 
 puzzle = list()
 
@@ -35,7 +35,7 @@ def WordSearch(i, j, depth, direction):
             return(WordSearch(i,j+1,depth+1,'right'))
         else: return(False)
     if direction == 'upleft':
-        if puzzle[i][j] == search_string[depth] and i > 0 and j < col_max:
+        if puzzle[i][j] == search_string[depth] and i > 0 and j > 0:
             return(WordSearch(i-1,j-1,depth+1,'upleft'))
         else: return(False)
     if direction == 'upright':
