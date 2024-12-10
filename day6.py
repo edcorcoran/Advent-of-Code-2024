@@ -1,15 +1,19 @@
 # Part One
 
-def loadMap(file):
+import copy
+
+def loadMap(filename):
+    fhand = open(filename)
     tempMap = list()
-    for line in file:
+    for line in fhand:
         tempMap.append(list(line.strip()))
+    fhand.close()
     return(tempMap)
 
-# fhand = open('day6sample.txt')
-fhand = open('day6.txt')
+# filename = 'day6sample.txt'
+filename = 'day6.txt'
 
-guardMap = loadMap(fhand)
+guardMap = loadMap(filename)
 
 row_max = len(guardMap)-1 # minus one to handle start at zero
 col_max = len(guardMap[0])-1
@@ -91,13 +95,92 @@ for row in guardPath:
     TotalCells += sum(row)
 
 print('Part One Answer',TotalCells)
-print('Number of Iterations',l)
+# print('Number of Iterations',l)
     
 
 
 # Part Two
 
 # reset map
-guardMap = loadMap(fhand)
-
+guardMap = loadMap(filename)
 maxLoops = 100000
+positionCount = 0
+
+
+def testGuardMap(testMap):
+    # find starting point
+    for i, row in enumerate(testMap):
+        for j, col in enumerate(row):
+            if col in ['^','v', '>','<']:
+                testState = col
+                testPosition = (i,j)
+    #move guard
+    i = testPosition[0]
+    j = testPosition[1]
+    l = 0
+    while True:
+        if l > maxLoops: return(True)
+        match testState:
+            case '^':
+                if i == 0:
+                    testMap[i][j] = '.'
+                    return(False)
+                elif testMap[i-1][j] == '.':
+                    testMap[i][j] = '.'
+                    testMap[i-1][j] = testState
+                    i = i-1
+                elif testMap[i-1][j] == '#':
+                    testMap[i][j] = '>'
+                    testState = '>'
+            case 'v':
+                if i == row_max:
+                    testMap[i][j] = '.'
+                    return(False)
+                elif testMap[i+1][j] == '.':
+                    testMap[i][j] = '.'
+                    testMap[i+1][j] = testState
+                    i = i+1
+                elif testMap[i+1][j] == '#':
+                    testMap[i][j] = '<'
+                    testState = '<'
+            case '>':
+                if j == col_max:
+                    testMap[i][j] = '.'
+                    return(False)
+                elif testMap[i][j+1] == '.':
+                    testMap[i][j] = '.'
+                    testMap[i][j+1] = testState
+                    j = j+1
+                elif testMap[i][j+1] == '#':
+                    testMap[i][j] = 'v'
+                    testState = 'v'
+            case '<':
+                if j == 0:
+                    testMap[i][j] = '.'
+                    return(False)
+                elif testMap[i][j-1] == '.':
+                    testMap[i][j] = '.'
+                    testMap[i][j-1] = testState
+                    j = j-1
+                elif testMap[i][j-1] == '#':
+                    testMap[i][j] = '^'
+                    testState = '^'
+        l = l+1
+
+
+
+# put a # in each cell and see what happens.
+for i, row in enumerate(guardMap):
+    for j, col in enumerate(row):
+        if col == '.':
+            copyMap = copy.deepcopy(guardMap)
+            copyMap[i][j] = '#'
+            # test if stuck
+            positionCount += testGuardMap(copyMap)
+            # reset the map
+            # guardMap[i][j] = '.'
+            #problem appears to be that I'm changing guardMap in memory and then reloading it while also iterating on it.
+            # maybe make a copy or something? 
+            # guardMap = loadMap(filename)
+
+print("Part Two Answer",positionCount)
